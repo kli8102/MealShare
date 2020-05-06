@@ -19,8 +19,15 @@ class Login extends React.Component {
 
     componentDidMount = () => {
         firebase.auth().onAuthStateChanged((user) => {
-            if (user) {         
-                this.setState({redirect: '/account/' + user.uid});    
+            if (user) {  
+                firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then((idToken) => {
+                    // Send token to your backend via HTTPS
+                    this.setState({redirect: '/account/' + idToken});
+                    // ...
+                }).catch(function(error) {
+                    // Handle error
+                });       
+                // this.setState({redirect: '/account/' + user.uid});    
             }
             return;
         });
@@ -60,7 +67,14 @@ class Login extends React.Component {
                 console.log("EMAIL NOT VERIFIED");
             }
             else {
-                this.setState({redirect: '/account/' + firebase.auth().currentUser.uid});
+                firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then((idToken) => {
+                    // Send token to your backend via HTTPS
+                    this.setState({redirect: '/account/' + idToken});
+                    // ...
+                }).catch(function(error) {
+                    // Handle error
+                });       
+                // this.setState({redirect: '/account/' + firebase.auth().currentUser.uid});
             }
         })
         .catch((error) => {
@@ -72,7 +86,6 @@ class Login extends React.Component {
 
     render() {
 
-        
         // firebase.auth().onAuthStateChanged((user) => {
         //     if (user) {
         //         return <Redirect to={'/account/' + user.uid}/>;
@@ -118,6 +131,9 @@ class Login extends React.Component {
                     </Form>
                     <Message>
                         Don't have an account? <Link to={'/register'}> Sign Up </Link>
+                    </Message>
+                    <Message>
+                        <Link to={'/reset-password'}> Forgot Password? </Link>
                     </Message>
                     </Grid.Column>
                 </Grid>

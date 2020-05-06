@@ -10,6 +10,8 @@ class SignUp extends React.Component {
 
         this.state = {
             email: "",
+            first_name: "",
+            last_name: "",
             password: "",
             confirmPassword: "",
             redirect: null,
@@ -42,6 +44,14 @@ class SignUp extends React.Component {
         this.setState({email: event.target.value});
     }
 
+    handleFirstNameChange = (event) => {
+        this.setState({first_name: event.target.value});
+    }
+
+    handleLastNameChange = (event) => {
+        this.setState({last_name: event.target.value});
+    }
+
     handlePasswordChange = (event) => {
         this.setState({password: event.target.value});
     }
@@ -72,13 +82,28 @@ class SignUp extends React.Component {
                 // Email sent.
                 firebase.auth().signOut();
                 
-            }).catch(function(error) {
+            })
+            .then((result) => {
+                let db = firebase.firestore();
+                db.collection('user_information').doc(user.uid).set({
+                    email: this.state.email,
+                    first_name: this.state.first_name,
+                    last_name: this.state.last_name
+                })
+                .then((result) => {
+                    this.setState({redirect: '/account-created'});
+                })
+                .catch(function(error) {
+                    // An error happened.
+                    console.log("AN ERROR OCCURED IN DATABASE STORE");
+                    return;
+                });
+            })
+            .catch(function(error) {
                 // An error happened.
                 console.log("AN ERROR OCCURED IN SENDING EMAIL VERIFICATION");
+                return;
             });
-        })
-        .then((result) => {
-            this.setState({redirect: '/account-created'});
         })
         .catch(function(error) {
             // Handle Errors here.
@@ -109,6 +134,22 @@ class SignUp extends React.Component {
                     <Segment stacked>
                     <Form.Input fluid icon='user' iconPosition='left' placeholder='Email' 
                         onChange={this.handleUserChange} value={this.state.email}/>
+                    <Form.Input
+                        fluid
+                        icon='user'
+                        iconPosition='left'
+                        placeholder='First Name'
+                        onChange={this.handleFirstNameChange}
+                        value={this.state.first_name}
+                    />
+                    <Form.Input
+                        fluid
+                        icon='user'
+                        iconPosition='left'
+                        placeholder='Last Name'
+                        onChange={this.handleLastNameChange}
+                        value={this.state.last_name}
+                    />
                     <Form.Input
                         fluid
                         icon='lock'
