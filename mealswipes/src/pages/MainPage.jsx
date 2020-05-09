@@ -56,7 +56,7 @@ class MainPage extends React.Component {
                 <Menu.Item position='right'>   
                 <Form>
                     <Button color='blue' fluid size='large' type='button' onClick={this.handleSubmission}>
-                            Logout
+                            Logout Aither
                     </Button>
                 </Form>
                 </Menu.Item>
