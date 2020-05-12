@@ -1,6 +1,6 @@
 import React from 'react';
 import { List, Button, Form, Grid, Header, Image, Message, Segment, GridColumn, GridRow } from 'semantic-ui-react';
-import { Input, Menu } from 'semantic-ui-react'
+import { Divider, Input, Menu } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom';
 import firebase from '../Firebase/firebase.js';
 
@@ -23,14 +23,26 @@ class RequestBox extends React.Component {
             console.log(querySnapshot)
             querySnapshot.forEach((doc) => {
                 swipe_requests.push(doc);
-            
-                console.log(doc.data())
             });
             this.setState({requests: swipe_requests})
         });
     }
 
-    
+    handleRemoveRequest = (event) => {
+        const key = event.target.id;
+        let db = firebase.firestore();
+        db.collection("swipe_requests").doc(key).delete()
+        .then((result) => {
+            this.forceUpdate();
+        })
+        .catch((error) => {
+            console.log("FAILED TO DELETE: " + error);
+        })
+    }
+
+    handleEditRequest = () => {
+
+    }
     
     render() {
 
@@ -45,18 +57,36 @@ class RequestBox extends React.Component {
             var time = date_posted.getHours() + ":" + date_posted.getMinutes() + ":" + date_posted.getSeconds();
             var dateTime = date+' '+time;
             const description = request.description;
+            const uid = request.uid;
             
             let item = (
-                
                 <List.Item key={request_data.id}>
-                <List.Icon name='github' size='large' verticalAlign='middle' />
-                <List.Content>
-                <List.Header as='a'>{display_name}</List.Header>
-                    <List.Description as='a'>{dateTime}</List.Description>
-                    <List.Description as='a'>{description}</List.Description>
-                </List.Content>
-                </List.Item>
-                
+                <Grid columns={2} divided>
+                <Grid.Row>
+                <Grid.Column>
+                    
+                    <List.Content>
+                        <List.Header as='a'>{<List.Icon name='github' size='large' verticalAlign='middle' />} {display_name}</List.Header>
+                        
+                        <List.Description as='a'>{dateTime}</List.Description>
+                        <Divider />
+                        <List.Description as='a'>{description}</List.Description>
+                        
+                    </List.Content>
+                </Grid.Column>
+                <Grid.Column>
+                    {uid == this.props.uid ? (<Form>
+                        <Button id={request_data.id} color='blue' fluid size='small' type='button' onClick={this.handleRemoveRequest}>
+                                                Remove Request
+                        </Button>
+                        <Button color='teal' fluid size='small' type='button' onClick={this.handleEditRequest}>
+                                                Edit Request
+                        </Button>
+                    </Form>) : <div> </div>}
+                </Grid.Column>
+                </Grid.Row>
+                </Grid>
+                </List.Item>   
             );
             return item;
         });

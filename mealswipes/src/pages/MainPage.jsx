@@ -46,6 +46,11 @@ class MainPage extends React.Component {
     
     }
 
+    handleRemoveRequest = () => {
+        
+    
+    }
+
     handleDescriptionChange = (event) => {
         this.setState({description: event.target.value});
     }
@@ -97,7 +102,10 @@ class MainPage extends React.Component {
                 <Grid columns={2} divided>
                     <Grid.Row>
                     <Grid.Column>
-                           
+                           <Segment stacked>
+                                <Message color='blue' align='center'>Welcome {firebase.auth().currentUser.displayName}</Message>
+                           </Segment>
+                           <Segment> 
                             <Form>
                                 <Button color='blue' fluid size='small' type='button' onClick={this.handleSwipeRequest}>
                                         Request a Swipe
@@ -105,11 +113,18 @@ class MainPage extends React.Component {
                                 <TextArea onChange={this.handleDescriptionChange}
                                     value={this.state.description} placeholder='Enter a description' />
                             </Form>
+                            </Segment>
+                            
                     </Grid.Column>
                     <Grid.Column>
-                        <RequestBox/>
+                        <Segment style={{overflow: 'auto', maxHeight: 1000}}>
+                            <RequestBox uid={firebase.auth().currentUser.uid}/>
+                        </Segment>
                     </Grid.Column>
+
                     </Grid.Row>
+                    
+                    
                 </Grid>
 
                 
