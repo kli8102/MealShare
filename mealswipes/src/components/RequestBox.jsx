@@ -17,15 +17,18 @@ class RequestBox extends React.Component {
 
     componentDidMount = () => {
         let db = firebase.firestore();
-        db.collection("swipe_requests")
+        
+        db.collection("swipe_requests").orderBy("time_posted", "desc")
         .onSnapshot((querySnapshot) => {
             let swipe_requests = [];
-            console.log(querySnapshot)
             querySnapshot.forEach((doc) => {
                 swipe_requests.push(doc);
             });
             this.setState({requests: swipe_requests})
         });
+        
+        
+        
     }
 
     handleRemoveRequest = (event) => {
@@ -45,12 +48,12 @@ class RequestBox extends React.Component {
     }
     
     render() {
-
+        
         let swipe_requests = this.state.requests.map((request_data) => {
             let request = request_data.data();
 
             const display_name = request.display_name;
-           
+            
             const date_posted = request.time_posted.toDate();
 
             var date = date_posted.getFullYear()+'-'+(date_posted.getMonth()+1)+'-'+date_posted.getDate();
@@ -90,7 +93,9 @@ class RequestBox extends React.Component {
             );
             return item;
         });
-
+      
+        
+        
         return (
             <div>
                 <Header as='h2' content='Swipe Requests' />
