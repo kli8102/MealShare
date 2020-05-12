@@ -117,7 +117,7 @@ class MainPage extends React.Component {
                             
                     </Grid.Column>
                     <Grid.Column>
-                        <Segment style={{overflow: 'auto', maxHeight: 1000}}>
+                        <Segment style={{overflow: 'auto', maxHeight: 750}}>
                             <RequestBox uid={firebase.auth().currentUser.uid}/>
                         </Segment>
                     </Grid.Column>

@@ -46,6 +46,10 @@ class RequestBox extends React.Component {
     handleEditRequest = () => {
 
     }
+
+    handleProvideRequest = () => {
+
+    }
     
     render() {
         
@@ -58,7 +62,7 @@ class RequestBox extends React.Component {
 
             var date = date_posted.getFullYear()+'-'+(date_posted.getMonth()+1)+'-'+date_posted.getDate();
             var time = date_posted.getHours() + ":" + date_posted.getMinutes() + ":" + date_posted.getSeconds();
-            var dateTime = date+' '+time;
+            var dateTime = date_posted.toString()
             const description = request.description;
             const uid = request.uid;
             
@@ -72,8 +76,9 @@ class RequestBox extends React.Component {
                         <List.Header as='a'>{<List.Icon name='github' size='large' verticalAlign='middle' />} {display_name}</List.Header>
                         
                         <List.Description as='a'>{dateTime}</List.Description>
-                        <Divider />
-                        <List.Description as='a'>{description}</List.Description>
+                        <Segment style={{marginBottom: '5px'}}>
+                            <List.Description as='a'>{description}</List.Description>
+                        </Segment>
                         
                     </List.Content>
                 </Grid.Column>
@@ -85,7 +90,9 @@ class RequestBox extends React.Component {
                         <Button color='teal' fluid size='small' type='button' onClick={this.handleEditRequest}>
                                                 Edit Request
                         </Button>
-                    </Form>) : <div> </div>}
+                    </Form>) : (<Button color='yellow' fluid size='small' type='button' onClick={this.handleProvideRequest}>
+                                                Send Aid
+                        </Button>)}
                 </Grid.Column>
                 </Grid.Row>
                 </Grid>
