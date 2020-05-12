@@ -77,6 +77,9 @@ class SignUp extends React.Component {
         .then((result) => {
             
             let user = firebase.auth().currentUser;
+            result.user.updateProfile({
+                displayName: this.state.first_name + " " + this.state.last_name
+            })
 
             user.sendEmailVerification().then(function() {
                 // Email sent.

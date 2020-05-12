@@ -8,6 +8,7 @@ import AccountCreated from './pages/AccountCreated';
 import ResetPassword from './pages/ResetPassword';
 import PasswordResetSuccess from './pages/PasswordResetSuccessful';
 import PrivateRoute from './PrivateRoute.js';
+import firebase from './Firebase/firebase';
 import {
   BrowserRouter,
   Route,
@@ -20,7 +21,7 @@ function App() {
   return (
     <BrowserRouter>
     <Switch>
-      <PrivateRoute exact path="/account/:id" component={MainPage}/>
+      <PrivateRoute exact path="/account/:id" user={firebase.auth().currentUser} component={MainPage}/>
       <Route exact path="/register" component={SignUp}/>
       <Route exact path="/account-created" component={AccountCreated}/>
       <Route exact path="/reset-password" component={ResetPassword}/>

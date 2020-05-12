@@ -28,7 +28,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
     // New sign-in will be persisted with session persistence.
     //     return firebase.auth().signInWithPhoneNumber('+18563165972', appVerifier);
 })
-    .catch(function(error) {
+.catch(function(error) {
     // Handle Errors here.
     // var errorCode = error.code;
     // var errorMessage = error.message;

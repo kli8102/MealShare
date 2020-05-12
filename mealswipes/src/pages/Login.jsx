@@ -22,7 +22,7 @@ class Login extends React.Component {
             if (user) {  
                 firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then((idToken) => {
                     // Send token to your backend via HTTPS
-                    this.setState({redirect: '/account/' + idToken});
+                    this.setState({redirect: '/account/' + user.uid});
                     // ...
                 }).catch(function(error) {
                     // Handle error
@@ -69,7 +69,7 @@ class Login extends React.Component {
             else {
                 firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then((idToken) => {
                     // Send token to your backend via HTTPS
-                    this.setState({redirect: '/account/' + idToken});
+                    this.setState({redirect: '/account/' + firebase.auth().currentUser.uid});
                     // ...
                 }).catch(function(error) {
                     // Handle error

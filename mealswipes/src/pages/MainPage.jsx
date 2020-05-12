@@ -1,8 +1,9 @@
 import React from 'react';
-import { Button, Form, Grid, Header, Image, Message, Segment, GridColumn } from 'semantic-ui-react';
-import { Input, Menu } from 'semantic-ui-react'
+import { Button, Form, Grid, Header, Image, Message, Segment, GridColumn, GridRow } from 'semantic-ui-react';
+import { TextArea, Input, Menu } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom';
 import firebase from '../Firebase/firebase.js';
+import RequestBox from '../components/RequestBox';
 
 class MainPage extends React.Component {
     constructor(props) {
@@ -10,7 +11,8 @@ class MainPage extends React.Component {
 
         this.state = {
             activeItem: 'home',
-            redirect: null     
+            redirect: null,
+            description: ""
         };
         
     }
@@ -23,6 +25,29 @@ class MainPage extends React.Component {
             // An error happened.
             console.log("ERROR IN LOGOUT " + error);
         });
+    }
+
+    handleSwipeRequest = () => {
+        let user = firebase.auth().currentUser;
+        console.log(user);
+        let db = firebase.firestore();
+        db.collection("swipe_requests").add({
+            description: this.state.description,
+            display_name: user.displayName,
+            time_posted: firebase.firestore.Timestamp.now(),
+            uid: firebase.auth().currentUser.uid
+        })
+        .then((result) => {
+            this.setState({description: ""});
+        })
+        .catch((error) => {
+            console.log("ERROR " + error);
+        });
+    
+    }
+
+    handleDescriptionChange = (event) => {
+        this.setState({description: event.target.value});
     }
 
     handleItemClick = (e, { name }) => this.setState({ activeItem: name })
@@ -38,6 +63,10 @@ class MainPage extends React.Component {
         return (
             <div>
                 <Menu pointing>
+                {/* <Menu.Item>
+                    <Image src={require('../images/logo.png')}></Image>
+                </Menu.Item> */}
+                
                 <Menu.Item
                     name='home'
                     active={activeItem === 'home'}
@@ -53,23 +82,35 @@ class MainPage extends React.Component {
                     active={activeItem === 'friends'}
                     onClick={this.handleItemClick}
                 />
-                <Menu.Item position='right'>   
-                <Form>
-                    <Button color='blue' fluid size='large' type='button' onClick={this.handleSubmission}>
-                            Logout
-                    </Button>
-                </Form>
-                </Menu.Item>
+                
                 <Menu.Menu position='right'>
                     <Menu.Item>
-                    <Input icon='search' placeholder='Search...' />
+                        <Form>
+                            <Button color='blue' fluid size='small' type='button' onClick={this.handleSubmission}>
+                                    Logout
+                            </Button>
+                        </Form>
                     </Menu.Item>
                 </Menu.Menu>
                 </Menu>
 
-                <Segment>
-                    <Image src={require('../images/logo.png')} /> 
-                </Segment>
+                <Grid columns={2} divided>
+                    <Grid.Row>
+                    <Grid.Column>
+                           
+                            <Form>
+                                <Button color='blue' fluid size='small' type='button' onClick={this.handleSwipeRequest}>
+                                        Request a Swipe
+                                </Button>
+                                <TextArea onChange={this.handleDescriptionChange}
+                                    value={this.state.description} placeholder='Enter a description' />
+                            </Form>
+                    </Grid.Column>
+                    <Grid.Column>
+                        <RequestBox/>
+                    </Grid.Column>
+                    </Grid.Row>
+                </Grid>
 
                 
             </div>
