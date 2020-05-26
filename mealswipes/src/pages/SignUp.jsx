@@ -20,6 +20,9 @@ class SignUp extends React.Component {
         
     }
 
+    componentWillUnmount = () => {
+
+    }
     // componentDidMount = () => {
     //     firebase.auth().onAuthStateChanged((user) => {
     //         if (user) {
@@ -95,6 +98,7 @@ class SignUp extends React.Component {
                 })
                 .then((result) => {
                     this.setState({redirect: '/account-created'});
+                    return;
                 })
                 .catch(function(error) {
                     // An error happened.

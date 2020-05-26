@@ -6,7 +6,7 @@ import RequestEntry from './RequestEntry';
 import firebase from '../Firebase/firebase.js';
 
 
-class RequestBox extends React.Component {
+class MyRequests extends React.Component {
     constructor(props) {
         super(props);
 
@@ -15,22 +15,6 @@ class RequestBox extends React.Component {
         };
         
     }
-
-    // componentDidMount = () => {
-    //     let db = firebase.firestore();
-        
-    //     db.collection("swipe_requests").orderBy("time_posted", "desc")
-    //     .onSnapshot((querySnapshot) => {
-    //         let swipe_requests = [];
-            
-    //         querySnapshot.forEach((doc) => {
-    //             swipe_requests.push(doc);
-                
-    //         });
-    //         this.setState({requests: swipe_requests});
-    //     });    
-    // }
-    
 
     initializeBox = () => {
         
@@ -75,4 +59,4 @@ class RequestBox extends React.Component {
     }
 }
 
-export default RequestBox;
+export default MyRequests;

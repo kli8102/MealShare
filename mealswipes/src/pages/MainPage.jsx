@@ -12,9 +12,25 @@ class MainPage extends React.Component {
         this.state = {
             activeItem: 'home',
             redirect: null,
-            description: ""
+            description: "",
+            requests: []
         };
         
+    }
+
+    componentDidMount = () => {
+        let db = firebase.firestore();
+        
+        db.collection("swipe_requests").orderBy("time_posted", "desc")
+        .onSnapshot((querySnapshot) => {
+            let swipe_requests = [];
+            
+            querySnapshot.forEach((doc) => {
+                swipe_requests.push(doc);
+                
+            });
+            this.setState({requests: swipe_requests});
+        });    
     }
 
     handleSubmission = () => {
@@ -43,11 +59,6 @@ class MainPage extends React.Component {
         .catch((error) => {
             console.log("ERROR " + error);
         });
-    
-    }
-
-    handleRemoveRequest = () => {
-        
     
     }
 
@@ -117,8 +128,8 @@ class MainPage extends React.Component {
                             
                     </Grid.Column>
                     <Grid.Column>
-                        <Segment style={{overflow: 'auto', maxHeight: 750}}>
-                            <RequestBox uid={firebase.auth().currentUser.uid}/>
+                        <Segment style={{overflow: 'auto', maxHeight: 800}}>
+                            <RequestBox uid={firebase.auth().currentUser.uid} swipe_requests={this.state.requests}/>
                         </Segment>
                     </Grid.Column>
 
