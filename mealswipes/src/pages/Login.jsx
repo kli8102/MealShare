@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, Grid, Header, Image, Message, Segment } from 'semantic-ui-react';
+import { Button, Form, Grid, Header, Image, Message, Segment, Popup } from 'semantic-ui-react';
 import { Redirect } from 'react-router-dom';
 import firebase from '../Firebase/firebase.js';
 import { Link } from 'react-router-dom';
@@ -11,6 +11,8 @@ class Login extends React.Component {
         this.state = {
             email: "",
             password: "",
+            incorrectPassword: false,
+            isOpen: false,
             redirect: null,
             alertValidateE: true, // Not yet used. Will be used to determine if there is validation error
         };
@@ -31,6 +33,14 @@ class Login extends React.Component {
             }
             return;
         });
+    }
+
+    handleOpen = () => {
+        this.setState({ isOpen: false })
+      }
+    
+    handleClose = () => {
+        this.setState({ isOpen: true })
     }
 
     checkFormData = () => {
@@ -79,7 +89,11 @@ class Login extends React.Component {
         })
         .catch((error) => {
             // Handle Errors here.
-            console.log("INVALID CREDENTIALS")
+            console.log("INVALID CREDENTIALS");
+            this.setState({ 
+                incorrectPassword: true,
+                password : "", 
+            });
             // ...
         });
     }   
@@ -108,24 +122,34 @@ class Login extends React.Component {
                     </Header>
                     <Header as='h2' color='blue' textAlign='center'>
                         {/* <Image src={require('./images/logo_image.png')} /> Log-in to your account */}
-                        Log-in to your account
+                        Log into your account
                     </Header>
                     <Form size='large'>
                         <Segment stacked>
                         <Form.Input fluid icon='user' iconPosition='left' placeholder='Email' 
                             onChange={this.handleUserChange} value={this.state.email}/>
-                        <Form.Input
-                            fluid
-                            icon='lock'
-                            iconPosition='left'
-                            placeholder='Password'
-                            type='password'
-                            onChange={this.handlePasswordChange}
-                            value={this.state.password}
+                        <Popup
+                            //style={{ backgroundColor: '#be4b49' }}
+                            trigger={
+                                <Form.Input
+                                    fluid
+                                    icon='lock'
+                                    iconPosition='left'
+                                    placeholder='Password'
+                                    type='password'
+                                    onChange={this.handlePasswordChange}
+                                    value={this.state.password}
+                                />
+                            }
+                            content='The password you entered is incorrect.'
+                            on='hover'
+                            open={this.state.incorrectPassword && this.state.isOpen}
+                            onClose={this.handleClose}
+                            onOpen={this.handleOpen}
+                            position='right center'
                         />
-
                         <Button color='blue' fluid size='large' type='button' onClick={this.handleSubmission}>
-                            Login
+                            Log In
                         </Button>
                         </Segment>
                     </Form>

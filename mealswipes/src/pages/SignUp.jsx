@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, Grid, Header, Image, Message, Segment } from 'semantic-ui-react';
+import { Button, Form, Grid, Header, Image, Message, Segment, Popup } from 'semantic-ui-react';
 import { Redirect } from 'react-router-dom';
 import firebase from '../Firebase/firebase.js';
 import { Link } from 'react-router-dom';
@@ -14,6 +14,8 @@ class SignUp extends React.Component {
             last_name: "",
             password: "",
             confirmPassword: "",
+            incorrectPassword: false,
+            isOpen: false,
             redirect: null,
             alertValidateE: true, // Not yet used. Will be used to determine if there is validation error
         };
@@ -31,6 +33,14 @@ class SignUp extends React.Component {
     //         return;
     //     });
     // }
+
+    handleOpen = () => {
+        this.setState({ isOpen: false })
+      }
+    
+    handleClose = () => {
+        this.setState({ isOpen: true })
+    }
 
     checkFormData = () => {
         // Will implement in future if checks become necessary
@@ -73,6 +83,11 @@ class SignUp extends React.Component {
 
         if (this.state.password !== this.state.confirmPassword) {
             console.log("PASSWORDS DON'T MATCH");
+            this.setState({ 
+                incorrectPassword: true,
+                password : "", 
+                confirmPassword : "",
+            });
             return;
         }
 
@@ -166,15 +181,26 @@ class SignUp extends React.Component {
                         onChange={this.handlePasswordChange}
                         value={this.state.password}
                     />
-                    <Form.Input
-                        fluid
-                        icon='lock'
-                        iconPosition='left'
-                        placeholder='Confirm Password'
-                        type='password'
-                        onChange={this.handleConfirmPasswordChange}
-                        value={this.state.confirmPassword}
+                    <Popup 
+                        trigger={
+                            <Form.Input
+                                fluid
+                                icon='lock'
+                                iconPosition='left'
+                                placeholder='Confirm Password'
+                                type='password'
+                                onChange={this.handleConfirmPasswordChange}
+                                value={this.state.confirmPassword}
+                            />
+                        }
+                        content='Passwords do not match.'
+                        on='hover'
+                        open={this.state.incorrectPassword && this.state.isOpen}
+                        onClose={this.handleClose}
+                        onOpen={this.handleOpen}
+                        position='right center'
                     />
+                    
 
                     <Button color='blue' fluid size='large' type='button' onClick={this.handleSubmission}>
                         Register
