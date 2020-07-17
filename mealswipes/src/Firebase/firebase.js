@@ -2,14 +2,7 @@ import * as firebase from 'firebase';
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAsp5T1uRCb0Oa4JSmJ7KwkK8lCNjpG5NU",
-    authDomain: "meal-swipe-19431.firebaseapp.com",
-    databaseURL: "https://meal-swipe-19431.firebaseio.com",
-    projectId: "meal-swipe-19431",
-    storageBucket: "meal-swipe-19431.appspot.com",
-    messagingSenderId: "105276358753",
-    appId: "1:105276358753:web:5b78ff407683bebd69ea20",
-    measurementId: "G-LBMMF2M23M"
+    // Removed
   };
 
 
