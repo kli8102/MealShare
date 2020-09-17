@@ -10,7 +10,8 @@ class RequestEntry extends React.Component {
 
         this.state = {
             display_status: 'NORMAL',
-            text_content: ''
+            text_content: '',
+            provider_message: ''
         };
         
     }
@@ -35,6 +36,10 @@ class RequestEntry extends React.Component {
         this.setState({display_status: 'SEND_AID'})
     }
 
+    handleProviderMessageChange = (event) => {
+        this.setState({provider_message: event.target.value});
+
+    }
     normalGrid = (doc_id, display_name, dateTime, description, uid) => {
         return (<Grid columns={2} divided>
             <Grid.Row>
@@ -83,8 +88,8 @@ class RequestEntry extends React.Component {
                     
                     <Segment style={{marginBottom: '5px'}}>
                         <Form>
-                            <TextArea onChange={this.handleDescriptionChange}
-                                value={this.state.description} placeholder='Enter a message to the requester' />
+                            <TextArea onChange={this.handleProviderMessageChange}
+                                value={this.state.provider_message} placeholder='Enter a message to the requester' />
                         </Form>
                     </Segment>
                     
@@ -93,7 +98,7 @@ class RequestEntry extends React.Component {
             
                 <Grid.Column>
                 <Form>
-                    <Button data-id={uid} color='green' fluid size='small' type='button' onClick={this.handleConfirmAidRequest}>
+                    <Button data-id={uid} color='green' fluid size='small' type='button' onClick={() => this.handleConfirmAidRequest(doc_id, display_name, dateTime, description, uid)}>
                                         Send Message
                     </Button>
                     <Button data-id={uid} color='red' fluid size='small' type='button' onClick={this.handleCancelRequest}>
@@ -108,8 +113,58 @@ class RequestEntry extends React.Component {
         </Grid>);
     }
 
-    handleConfirmAidRequest = () => {
+    aidSentGrid = (doc_id, display_name, dateTime, description, uid) => {
+        return (<Grid columns={2} divided>
+            <Grid.Row>
+            <Grid.Column>
+                
+                <List.Content>
+                    <List.Header as='a'>{<List.Icon name='github' size='large' verticalAlign='middle' />} {display_name}</List.Header>
+                    
+                    <List.Description as='a'>{dateTime}</List.Description>
+                    <Segment style={{marginBottom: '5px'}}>
+                        <List.Description as='a'>{description}</List.Description>
+                    </Segment>
+                    
+                </List.Content>
+            </Grid.Column> 
+            <Grid.Column>
+                
+                <List.Content>
+                    
+                    <Segment style={{marginBottom: '5px'}}>
+                        Your message has been sent. Thank you for your contribution!
+                    </Segment>
+                    
+                </List.Content>
+            </Grid.Column>
+            
+              
+            
+           
+            </Grid.Row>
+        </Grid>);
+    }
 
+    handleConfirmAidRequest = (doc_id, display_name, dateTime, description, uid) => {
+        
+        console.log("IN HERE");
+        const curr_id = firebase.auth().currentUser.uid;
+        let db = firebase.firestore();
+        db.collection("swipe_providers").doc(uid).collection("supporters").doc(curr_id).set({
+            message: this.state.provider_message,
+            requester_id: curr_id,
+            time_posted: firebase.firestore.Timestamp.now(),
+            
+        })
+        .then((result) => {
+            this.setState({display_status: 'AID_SENT'});
+        })
+        .catch((error) => {
+            console.log("FAILED: " + error);
+        })
+        
+        //console.log("SENT");
     }
 
     handleCancelRequest = () => {
@@ -124,6 +179,9 @@ class RequestEntry extends React.Component {
         }
         else if (display_status == 'SEND_AID') {
             return this.sendAidGrid(props.doc_id, props.display_name, props.dateTime, props.description, props.uid);
+        }
+        else if (display_status == 'AID_SENT') {
+            return this.aidSentGrid(props.doc_id, props.display_name, props.dateTime, props.description, props.uid);
         }
     }
 
