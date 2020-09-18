@@ -4,6 +4,7 @@ import { TextArea, Input, Menu } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom';
 import firebase from '../Firebase/firebase.js';
 import RequestBox from '../components/RequestBox';
+import MyResponses from '../components/MyResponses';
 
 class MainPage extends React.Component {
     constructor(props) {
@@ -13,24 +14,119 @@ class MainPage extends React.Component {
             activeItem: 'home',
             redirect: null,
             description: "",
-            requests: []
+            requests: [],
+            responses: []
         };
         
     }
 
     componentDidMount = () => {
         let db = firebase.firestore();
-        
+        let currentUser = firebase.auth().currentUser.uid;
         db.collection("swipe_requests").orderBy("time_posted", "desc")
         .onSnapshot((querySnapshot) => {
             let swipe_requests = [];
             
             querySnapshot.forEach((doc) => {
+
                 swipe_requests.push(doc);
                 
             });
-            this.setState({requests: swipe_requests});
+            //this.setState({requests: swipe_requests});
+            db.collection("swipe_providers").doc(currentUser).collection("supporters").get()
+            .then(async (querySnapshot) => {
+                // if (querySnapshot.empty) {
+                //     return;
+                // }
+                
+               
+                let swipe_responses = [];
+                
+                let processProviderDocs = async (doc) => {
+                    
+                    // console.log("DOC_ID: " + doc.data().doc_id);
+                    
+                    await db.collection('swipe_requests').doc(doc.data().doc_id).get()
+                    .then((response) => {
+                        
+                        let add_data = {
+                            swipes: response,
+                            supporter: doc.data().supporter_id,
+                            supporter_time_posted: doc.data().time_posted, 
+                            supporter_name: doc.data().supporter_name,
+                            message: doc.data().message,
+                            doc_id: doc.data().doc_id
+                        };
+                        swipe_responses.push(add_data);
+                        
+                        
+                        
+                    })
+                    .catch((error) => {
+                        
+                        console.log("Error fetching data: " + error);
+                    }) 
+                    
+                    
+                        
+                    
+                }
+                console.log(querySnapshot.docs.length)
+                for (let i = 0; i < querySnapshot.docs.length; i++) {
+                    await processProviderDocs(querySnapshot.docs[i]);
+                }
+                this.setState({requests: swipe_requests, responses: swipe_responses});
+
+
+                // querySnapshot.forEach(async (doc) => {
+                    
+                //     // console.log("DOC_ID: " + doc.data().doc_id);
+                    
+                //     await db.collection('swipe_requests').doc(doc.data().doc_id).get()
+                //     .then((response) => {
+                        
+                //         let add_data = {
+                //             swipes: response,
+                //             supporter: doc.data().supporter_id,
+                //             supporter_time_posted: doc.data().time_posted
+                //         };
+                //         swipe_responses.push(add_data);
+                //         console.log("IN QUERY: " + swipe_responses.length)
+                //         counter++;
+                //         if (counter == querySnapshot.length) {
+                //             this.setState({requests: swipe_requests, responses: swipe_responses});
+                //         }
+                        
+                        
+                //     })
+                //     .catch((error) => {
+                        
+                //         console.log("Error fetching data: " + error);
+                //     }) 
+                    
+                    
+                        
+                    
+                // })
+                
+
+                
+                
+                
+                
+                
+            }, 
+            error => {
+                console.log(error)
+            })
+            
         });    
+
+        
+        
+        
+    
+        
     }
 
     handleSubmission = () => {
@@ -124,6 +220,10 @@ class MainPage extends React.Component {
                                 <TextArea onChange={this.handleDescriptionChange}
                                     value={this.state.description} placeholder='Enter a description' />
                             </Form>
+                            </Segment>
+
+                            <Segment style={{overflow: 'auto', maxHeight: 550}}>
+                                <MyResponses uid={firebase.auth().currentUser.uid} swipe_responses={this.state.responses}/>
                             </Segment>
                             
                     </Grid.Column>

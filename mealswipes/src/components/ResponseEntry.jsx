@@ -4,7 +4,7 @@ import { TextArea, Divider, Input, Menu } from 'semantic-ui-react'
 import { Redirect } from 'react-router-dom';
 import firebase from '../Firebase/firebase.js';
 
-class RequestEntry extends React.Component {
+class ResponseEntry extends React.Component {
     constructor(props) {
         super(props);
 
@@ -18,16 +18,40 @@ class RequestEntry extends React.Component {
         
     }
 
-    handleRemoveRequest = (event) => {
+    handleResolveRequest = (event) => {
         const key = event.target.dataset.id;
+        console.log(this.props.doc_id)
         let db = firebase.firestore();
-        db.collection("swipe_requests").doc(key).delete()
+
+        db.collection("swipe_requests").doc(this.props.doc_id).delete()
         .then((result) => {
             this.forceUpdate();
+            
         })
         .catch((error) => {
             console.log("FAILED TO DELETE: " + error);
         })
+
+        db.collection("swipe_providers").doc(this.props.uid).collection("supporters").doc(this.props.supporter).delete()
+            .then((result) => {
+                
+                db.collection("swipe_providers").doc(this.props.supporter).collection("supportees").doc(this.props.uid).delete()
+                .then((result) => {
+                    this.forceUpdate();
+                })
+                .catch((error) => {
+                    console.log("FAILED TO DELETE: " + error);
+                })
+            })
+            .catch((error) => {
+                console.log("FAILED TO DELETE: " + error);
+            })
+
+        
+
+        
+
+
     }
 
     handleEditRequest = () => {
@@ -48,30 +72,28 @@ class RequestEntry extends React.Component {
             <Grid.Column>
                 
                 <List.Content>
-                    <List.Header as='a'>{<List.Icon name='github' size='large' verticalAlign='middle' />} {display_name}</List.Header>
+                    <List.Header as='a'>{<List.Icon name='github' size='large' verticalAlign='middle' />} {this.props.supporter_name}</List.Header>
                     
-                    <List.Description as='a'>{dateTime}</List.Description>
+                    <List.Description as='a'>{this.props.supporter_ts}</List.Description>
                     <Segment style={{marginBottom: '5px'}}>
-                        <List.Description as='a'>{description}</List.Description>
+                        <List.Description as='a'>{this.props.message}</List.Description>
                     </Segment>
                     
                 </List.Content>
             </Grid.Column>
             <Grid.Column>
-                {(uid == this.props.current_uid) ? this.userRequests(doc_id) : this.otherRequests(doc_id)}
+                {this.resolveRequests(doc_id)}
             </Grid.Column>
             </Grid.Row>
         </Grid>);
     }
 
-    userRequests = (uid) => {
+    resolveRequests = (doc_id) => {
         return (<Form>
-            <Button data-id={uid} color='blue' fluid size='small' type='button' onClick={this.handleRemoveRequest}>
-                                    Remove Request
+            <Button data-id={doc_id} color='pink' fluid size='small' type='button' onClick={this.handleResolveRequest}>
+                                    Resolve Request
             </Button>
-            <Button data-id={uid} color='teal' fluid size='small' type='button' onClick={this.handleEditRequest}>
-                                    Edit Request
-            </Button>
+            
         </Form>);
     };
 
@@ -157,8 +179,6 @@ class RequestEntry extends React.Component {
         db.collection("swipe_providers").doc(uid).collection("supporters").doc(curr_id).set({
             doc_id: this.state.request_id,
             supporter_id: curr_id,
-            supporter_name: firebase.auth().currentUser.displayName,
-            message: this.state.provider_message,
             time_posted: ts,
             
         })
@@ -167,9 +187,7 @@ class RequestEntry extends React.Component {
 
             db.collection("swipe_providers").doc(curr_id).collection("supportees").doc(uid).set({
                 doc_id: this.state.request_id,
-                supportee_id: uid,
-                supportee_name: display_name,
-                message: this.state.provider_message,
+                supportee_id: curr_id,
                 time_posted: ts,
             })
             .then((result) => {
@@ -214,4 +232,4 @@ class RequestEntry extends React.Component {
     }
 }
 
-export default RequestEntry
+export default ResponseEntry
